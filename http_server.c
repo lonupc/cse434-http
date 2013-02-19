@@ -1,5 +1,7 @@
 /* Much of the structure of the networking code in main() and do_bind() is from
  * Beej's Guide to Network Programming, at http://beej.us/guide/bgnet/ */
+#include "header_parse.h"
+#include "server_util.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -74,10 +76,22 @@ int main() {
 
 void serve(int sock, struct sockaddr_storage addr, socklen_t len) {
     char s[INET6_ADDRSTRLEN];
+    struct req_info info;
+
     inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr),
             s, sizeof s);
     printf("Got connection from %s\n", s);
+    setup_req_info(&info);
 
+    parse_headers(sock, &info);
+
+    if (info.user_agent) {
+        printf("User agent \"%s\" requested \"%s\"\n", info.user_agent, info.resource);
+    } else {
+        printf("Got request \"%s\"\n", info.resource);
+    }
+
+    clear_req_info(&info);
     close(sock);
 }
 
