@@ -78,6 +78,7 @@ void serve(int sock, struct sockaddr_storage addr, socklen_t len) {
     char s[INET6_ADDRSTRLEN];
     struct req_info info;
 
+    (void)len; /* Get rid of unused parameter warning */
     inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr),
             s, sizeof s);
     printf("Got connection from %s\n", s);
@@ -148,6 +149,7 @@ int do_bind() {
 
 /* A few utility functions */
 void reap_children(int sig) {
+    (void)sig; /* Get rid of unused parameter warning */
     while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 void *get_in_addr(struct sockaddr *sa) {
