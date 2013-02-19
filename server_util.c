@@ -5,10 +5,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#define SERVER_HEADERS \
-    "Server: http_server/1.0\r\n" \
-    "\r\n"
-
 /* Not the most efficient code, reads one byte at a time. But it works. */
 int recv_getline(int sock, char *buf, int buflen) {
     int n;
@@ -41,14 +37,16 @@ void sendall(int sock, char *buf, int buflen) {
 
 void die_error(int sock, int code, char *desc) {
     char buf[32];
-    printf("dieing with error %d.\n", code);
+    printf("Returning status %d.\n", code);
     snprintf(buf, sizeof buf, "HTTP/1.1 %d ", code);
 
     sendall(sock, buf, strlen(buf));
     sendall(sock, desc, strlen(desc));
     sendall(sock, "\r\n", 2);
 
-    sendall(sock, SERVER_HEADERS, sizeof(SERVER_HEADERS) - 1);
+    /* n.b. -1 for the trailing \0 */
+    sendall(sock, SERVER_HEADER, sizeof(SERVER_HEADER) - 1);
+    sendall(sock, "\r\n", 2);
 
     close(sock);
     exit(2);

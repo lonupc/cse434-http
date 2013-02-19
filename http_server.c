@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
@@ -24,7 +25,7 @@ void reap_children(int sig);
 /* Utility function for IPv4/IPv6 independence */
 void *get_in_addr(struct sockaddr *sa);
 /* Main service function */
-void serve(int sock, struct sockaddr_storage addr, socklen_t len);
+void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_root_len);
 
 
 int main() {
@@ -32,8 +33,12 @@ int main() {
     int client_sock;
     struct sockaddr_storage client_addr;
     socklen_t client_len;
+    /* It would be easy enough to add support for an "htdocs" directory */
+    char server_root[1024];
     
     struct sigaction sa;
+
+    getcwd(server_root, sizeof(server_root));
 
     serv_sock = do_bind();
 
@@ -62,7 +67,7 @@ int main() {
         if (!fork()) {
             /* Client process */
             close(serv_sock);
-            serve(client_sock, client_addr, client_len);
+            serve(client_sock, client_addr, server_root, sizeof(server_root));
             exit(0);
         }
 
@@ -74,11 +79,14 @@ int main() {
 }
 
 
-void serve(int sock, struct sockaddr_storage addr, socklen_t len) {
+void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_root_len) {
     char s[INET6_ADDRSTRLEN];
     struct req_info info;
+    struct stat stat_buf;
+    FILE *fp;
+    char buf[1024];
+    size_t nread;
 
-    (void)len; /* Get rid of unused parameter warning */
     inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr),
             s, sizeof s);
     printf("Got connection from %s\n", s);
@@ -91,8 +99,54 @@ void serve(int sock, struct sockaddr_storage addr, socklen_t len) {
     } else {
         printf("Got request \"%s\"\n", info.resource);
     }
+    strncat(serv_root, info.resource, serv_root_len - strlen(serv_root) - 1);
+
+
+    /* I could clean up this path, but I don't even care.
+     * Security? Who needs it?
+     */
+    if (stat(serv_root, &stat_buf) == -1) {
+        if (errno == ENOENT) {
+            die_error(sock, 404, "Not found");
+        }
+        if (errno == EACCES) {
+            die_error(sock, 403, "Forbidden");
+        }
+        die_error(sock, 500, "Internal server error");
+    }
+
+    /* Is it world-readable? */
+    if ((stat_buf.st_mode & 0004) == 0) {
+        die_error(sock, 403, "Forbidden");
+    }
+
+    if (info.if_modified_since) {
+        time_t tmp = mktime(info.if_modified_since);
+        if (tmp != -1 && tmp < stat_buf.st_mtime) {
+            die_error(sock, 304, "Not modified");
+        }
+    }
+
+    /* OK, from this point forth, we know the file's ok. */
+    if (!(fp = fopen(serv_root, "rb"))) {
+        die_error(sock, 500, "Internal server error");
+    }
+
+    snprintf(buf, sizeof buf, "HTTP/1.1 200 OK\r\n"
+            SERVER_HEADER
+            "Content-Length: %lu\r\n"
+            "\r\n",
+            (unsigned long)stat_buf.st_size);
+
+    sendall(sock, buf, strlen(buf));
+
+    while (!feof(fp) && !ferror(fp)) {
+        nread = fread(buf, 1, sizeof buf, fp);
+        sendall(sock, buf, nread);
+    }
 
     clear_req_info(&info);
+
     close(sock);
 }
 

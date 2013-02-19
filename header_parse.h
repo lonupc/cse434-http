@@ -1,6 +1,8 @@
 #ifndef HEADER_PARSE
 #define HEADER_PARSE
 
+#define HEADER_LINE_SIZE 1024
+
 #include <time.h>
 
 /* For now we only support GET */
@@ -11,7 +13,7 @@ struct req_info {
     char *resource;
     char *user_agent;
 
-    struct tm if_modified_since;
+    struct tm *if_modified_since;
 };
 
 void setup_req_info(struct req_info *info);

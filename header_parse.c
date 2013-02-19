@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define HEADER_LINE_SIZE 1024
-
 
 int parse_headers(int sock, struct req_info *info) {
     char buf[HEADER_LINE_SIZE];
@@ -47,6 +45,7 @@ int parse_headers(int sock, struct req_info *info) {
         if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
             die_error(sock, 400, "Bad request");
         }
+        /* Empty line, we've reached the end of the headers. */
         if (strcmp(buf, "\r\n") == 0) {
             break;
         }
@@ -69,7 +68,12 @@ int parse_headers(int sock, struct req_info *info) {
 
 void parse_single_header(char *key, char *val, struct req_info *info) {
     if (strcasecmp(key, "If-Modified-Since") == 0) {
-        parse_time(val, &info->if_modified_since);
+        info->if_modified_since = malloc(sizeof(*info->if_modified_since));
+        if (!info->if_modified_since) {
+            fprintf(stderr, "Out of memory.\n");
+        } else {
+            parse_time(val, info->if_modified_since);
+        }
     }
     if (strcasecmp(key, "User-Agent") == 0) {
         char *ua_end = val + strlen(val) - 1;
@@ -103,10 +107,15 @@ char *parse_time(char *timestr, struct tm *out) {
 }
 
 void setup_req_info(struct req_info *info) {
-    info->resource = info->user_agent = NULL;
+    info->resource =
+        info->user_agent =
+        NULL;
+    info->if_modified_since =
+        NULL;
 }
 void clear_req_info(struct req_info *info) {
     free(info->resource);
     free(info->user_agent);
+    free(info->if_modified_since);
     setup_req_info(info);
 }
