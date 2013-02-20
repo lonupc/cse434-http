@@ -17,12 +17,22 @@
 /* Get a socket and bind to it. */
 int do_bind();
 
+/* Parses the headers and sets the address and the file Name */
+void parseAddr(int argc, char * argv[], char * address, char * fileName);
+
 int main(int argc, char *argv[]) {
 	int serv_sock;
 	int client_sock;
 	struct sockaddr_storage client_addr;
+	char * address, fileName;
 
 	client_sock = do_bind();
+	praseAddr(argc, argv[], address, fileName);
+	
+	
+	
+	
+	
 
 	//argc is the number of arguements passed into the command line
 	//argv[1] is the first arguement
@@ -34,17 +44,35 @@ int main(int argc, char *argv[]) {
 
 }
 
-/* Returns the name of the file by traversing the arguements
-and determining which one is the file we're requesting */
+/* Parse the command line arguements and return an array with the
+IP address (in the first string), and the file name (in the second string) */
 
-char *getFile(int argc, char * argv[]){
+void parseAddr(int argc, char * argv[], char * address, char * fileName){
 	int i;
 
 	for(i = 0; i < argc; i++){
-		
+		if (!strncmp ("http://", argv[i], 7))
+			break;
+	}
+	if (i == argc){
+	 perror("No valid web address");
+        exit(1);
 	}
 
-
+	strtok(argv[i], "/");
+	strtok(argv[i], "/");
+	
+	//At this point we should be through the "http://"
+	address = strtok(argv[i], "/");
+	if (!address || strcmp(address, ""){
+		fprintf(stderr, "No valid address.\n");
+		exit(1);
+		}
+	fileName = strtok(argv[i], "/");
+	if (!fileName || strcmp(fileName, ""){
+		fprintf(stderr, "Error: No Valid File Name.\n");
+		exit(1);
+		}
 }
 
 /* This creates a socket (copied from Lewis's file), but does not bind.
