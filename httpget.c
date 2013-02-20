@@ -23,7 +23,7 @@ void parseAddr(int argc, char * argv[], char * address, char * fileName);
 int main(int argc, char *argv[]) {
 	int serv_sock;
 	int client_sock;
-	struct sockaddr_storage client_addr;
+	struct sockaddr_storage server_addr;
 	char * address, fileName;
 
 	client_sock = do_bind();
@@ -44,6 +44,8 @@ int main(int argc, char *argv[]) {
 
 }
 
+/* Conn
+
 /* Parse the command line arguements and return an array with the
 IP address (in the first string), and the file name (in the second string) */
 
@@ -52,7 +54,7 @@ void parseAddr(int argc, char * argv[], char * address, char * fileName){
 
 	for(i = 0; i < argc; i++){
 		if (!strncmp ("http://", argv[i], 7))
-			break;
+			break;//
 	}
 	if (i == argc){
 	 perror("No valid web address");
