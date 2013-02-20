@@ -190,7 +190,7 @@ int do_bind() {
             continue;
         }
         break;
-    }
+	}
 
     if (p == NULL) {
         fprintf(stderr, "Error: failed to bind to a port.\n");
