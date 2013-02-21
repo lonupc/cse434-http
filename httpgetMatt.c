@@ -26,15 +26,12 @@ void *get_in_addr(struct sockaddr *sa) {
 int main(int argc, char *argv[]) {
 	int sockfd, numbytes;  
 	char buf[MAXDATASIZE];
-	char * fileName;
+	char * fileName, address, time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	char s[INET_ADDRSTRLEN];
-	
-	if (argc != 3 ) {
-	    fprintf(stderr,"usage: hostname fileName\n");
-	    exit(1);
-	}
+
+	parse_addr(argc, argv, address, fileName);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -89,6 +86,13 @@ int main(int argc, char *argv[]) {
 		"AcceptLanguage: en\r\n"
 		"From: twoBerksAndAWilson\r\n"
 		"User-Agent: customHTTPClient/0.1\r\n");
+	
+	if (parse_time(argc, argv, time) == 1) {
+		sprintf(buf+strlen(buf), "If-modified-since: ");
+		sprintf(buf+strlen(buf), time);
+	}
+	
+	sprintf(buf+strlen(buf), "\r\n");
 	
 	// Send HTTP request messages
 	sendall(sockfd, buf, strlen(buf));
