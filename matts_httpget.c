@@ -22,6 +22,7 @@ int main (int argc, char *argv[]) {
 	char buf[MAXDATASIZE];
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
+	char s[INET_ADDRSTRLEN];
 	
 	if (argc != 2) {
 		fprintf(stderr, "usage: client hostname\n");
@@ -38,7 +39,7 @@ int main (int argc, char *argv[]) {
 	}
 	
 	// Loop through resulting IPs and connect to the first
-	for (p = servinfo; p != NULL; p->ai_next) _
+	for (p = servinfo; p != NULL; p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
 			perror("client: socket");
 			continue;
@@ -63,12 +64,12 @@ int main (int argc, char *argv[]) {
 	
 	freeaddrinfo(servinfo);
 	
-	if ((numofbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) P
+	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 		perror("recv");
 		exit(1);
 	}
 	
-	buf[numofbytes] = '\0';
+	buf[numbytes] = '\0';
 	
 	printf("client: recieved '%s'\n", buf);
 	
