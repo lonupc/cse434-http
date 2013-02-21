@@ -17,7 +17,6 @@
 	and returns 1 if there is a time and 0 if there isn't*/ 
 int parse_time(int argc, char * argv[], char * time){
 	int i;
-	char buffer[ARGUMENT_MAX];
 
 	for (i = 1; i < argc; i++){
 		if(strncmp("h", argv[i], 1))

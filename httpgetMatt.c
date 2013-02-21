@@ -32,12 +32,17 @@ void *get_in_addr(struct sockaddr *sa) {
 int main(int argc, char *argv[]) {
 	int sockfd;  
 	char buf[MAXDATASIZE];
-	char * fileName, *address, *time;
+	char *fileName, *address, *time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	FILE *fp;
 	char s[INET_ADDRSTRLEN];
 
+	// Allocate memory for input formatted inputted arguments
+	fileName = (char *)malloc(128 * sizeof(char));
+	address = (char *)malloc(128 * sizeof(char));
+	time = (char *)malloc(128 * sizeof(char));
+	
 	parse_addr(argc, argv, address, fileName);
 
 	memset(&hints, 0, sizeof hints);
