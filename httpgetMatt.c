@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
 	char * fileName, address, time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
+	FILE *fp;
 	char s[INET_ADDRSTRLEN];
 
 	parse_addr(argc, argv, address, fileName);
@@ -92,7 +93,7 @@ int main(int argc, char *argv[]) {
 		sprintf(buf+strlen(buf), time);
 	}
 	
-	sprintf(buf+strlen(buf), "\r\n");
+	sprintf(buf+strlen(buf), "\r\n\r\n");
 	
 	// Send HTTP request messages
 	sendall(sockfd, buf, strlen(buf));
@@ -100,10 +101,15 @@ int main(int argc, char *argv[]) {
 	// Check for incoming messages
 	rv = recv(sockfd, buf, MAXDATASIZE, 0);
 	if ( rv != 0) {
-		// Check status
-			// Output status if needed
+		// Parse Message
+			// Check status
+				// Output status if needed
+			// Change buf to outputted file
+			
 		// Download new file
-	
+		fp = fopen(fileName, "wb");
+		fprintf(fp, buf);
+		fclose(fp);
 	}
 	
 	close(sockfd);
