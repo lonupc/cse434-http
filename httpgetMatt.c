@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-
+#include "client_util.h
 #include <arpa/inet.h>
 
 #define PORT "http" // the port client will be connecting to 
