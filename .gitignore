@@ -16,5 +16,6 @@
 *.out
 *.app
 
-# Vim swap files
+# Misc files
 .*.swp
+tags

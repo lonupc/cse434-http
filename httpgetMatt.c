@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include "client_util.h
+#include "client_util.h"
 #include <arpa/inet.h>
 
 #define PORT "http" // the port client will be connecting to 
@@ -32,7 +32,7 @@ void *get_in_addr(struct sockaddr *sa) {
 int main(int argc, char *argv[]) {
 	int sockfd, numbytes;  
 	char buf[MAXDATASIZE];
-	char * fileName, address, time;
+	char * fileName, *address, *time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	FILE *fp;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	// Get File name from command lind
-	filename = argv[2];
+	fileName = argv[2];
 
 	// loop through all the results and connect to the first we can
 	for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -82,17 +82,15 @@ int main(int argc, char *argv[]) {
 	
 	// Create HTTP request message using inputted args
 	snprintf(buf, sizeof buf,
-		"GET "
-		fileName
-		" HTTP/1.1\r\n"
-		"Host: "
-		argv[1]
+		"GET %s HTTP/1.1\r\n"
+		"Host: %s\r\n"
 		"Accept: text/plain, text/html"
 		"Accept-Charset: *\r\n"
 		"Accept-Encoding: *\r\n"
 		"AcceptLanguage: en\r\n"
 		"From: twoBerksAndAWilson\r\n"
-		"User-Agent: customHTTPClient/0.1\r\n");
+		"User-Agent: customHTTPClient/0.1\r\n",
+        fileName, argv[1]);
 	
 	if (parse_time(argc, argv, time) == 1) {
 		sprintf(buf+strlen(buf), "If-modified-since: ");
@@ -122,11 +120,11 @@ If there is an error message, it prints it. If not, it reads the file,
 and returns the string that needs to be written to fileToWrite
 */
 void handle_response(int sock, char* fileToWrite){
-	char buf [HEADER_LINE_SIZE]
+	char buf [HEADER_LINE_SIZE];
 	char *p1;
 	char *p2;
-	char p3[50];
-	char *lengthStr;
+	char *p3;
+	char lengthStr[32];
 	int length;
 	int n;
 
@@ -152,7 +150,7 @@ void handle_response(int sock, char* fileToWrite){
 		printf("Reading File");
 		
 	while(1){
-		if (!recev_getline(sock, buf, HEADER_LINE_SIZE)){
+		if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
 			fprintf(stderr, "Client error receiving file");
 			exit(1);	
 		}

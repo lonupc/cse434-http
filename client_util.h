@@ -8,4 +8,4 @@ int parse_time(int argc, char * argv[], char * time);
 int recv_getline(int sock, char *buf, int buflen);
 void sendall(int sock, char *buf, int buflen);
 
-#endif /* CLIENT_UTIL
+#endif /* CLIENT_UTIL */
