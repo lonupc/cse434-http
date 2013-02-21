@@ -34,14 +34,14 @@ int parse_time(int argc, char * argv[], char * time){
 /* This searchese the arguements and determines if there is a well-formed
 	url. If there is, it sets the address and fileName strings, if not, 
 	it exits the program*/ 
-void parse_addr(int argc, char * argv[], char * address, char * fileName)
+void parse_addr(int argc, char * argv[], char ** address, char ** fileName)
 {
 	int i;
-	char test[ARGUMENT_MAX];
+    char *addrStart, *addrEnd;
 	
 	for(i = 1; i < argc; i++){
 		if (!strncmp ("http://", argv[i], 7))
-		break;
+            break;
 	}
 
 	if (i == argc){
@@ -49,24 +49,12 @@ void parse_addr(int argc, char * argv[], char * address, char * fileName)
         exit(1);
 	}
 
-	strcpy(test, argv[i]);
-	strtok(test, "/");
-	char * tempAddr = strtok(NULL, "/");
+    addrStart = argv[i] + sizeof "http://" - 1;
+    addrEnd = strstr(addrStart, "/");
 
-	if (tempAddr== NULL || !strcmp(tempAddr, "")){
-		fprintf(stderr, "Address is Malformed\n");
-		exit(1);
-	}
-	strcpy(address, tempAddr);
-	
-	char* tempFile = strtok(NULL, "/");	
-
-	if (!tempFile || !strcmp(tempFile, "")){
-		fprintf(stderr, "Error: Address is Malformed\n");
-		exit(1);
-	}
-	strcpy(fileName, tempFile);
-
+    *fileName = strdup(addrEnd);
+    *addrEnd = '\0';
+    *address = strdup(addrStart);
 }
 
 /* Not the most efficient code, reads one byte at a time. But it works. */

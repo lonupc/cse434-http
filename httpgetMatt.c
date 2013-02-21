@@ -32,30 +32,28 @@ void *get_in_addr(struct sockaddr *sa) {
 int main(int argc, char *argv[]) {
 	int sockfd;  
 	char buf[MAXDATASIZE];
-	char *fileName, *address, *time;
+	char *fileName = NULL,
+         *address = NULL,
+         *time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	FILE *fp;
 	char s[INET_ADDRSTRLEN];
 
 	// Allocate memory for input formatted inputted arguments
-	fileName = (char *)malloc(128 * sizeof(char));
-	address = (char *)malloc(128 * sizeof(char));
 	time = (char *)malloc(128 * sizeof(char));
-	
-	parse_addr(argc, argv, address, fileName);
+
+    /* address and fileName should be freed. */
+	parse_addr(argc, argv, &address, &fileName);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
+	if ((rv = getaddrinfo(address, PORT, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
-	
-	// Get File name from command lind
-	fileName = argv[2];
 
 	// loop through all the results and connect to the first we can
 	for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -95,7 +93,7 @@ int main(int argc, char *argv[]) {
 		"AcceptLanguage: en\r\n"
 		"From: twoBerksAndAWilson\r\n"
 		"User-Agent: customHTTPClient/0.1\r\n",
-        fileName, argv[1]);
+        fileName, address);
 	
 	if (parse_time(argc, argv, time) == 1) {
 		sprintf(buf+strlen(buf), "If-modified-since: ");
