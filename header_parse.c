@@ -46,7 +46,7 @@ int parse_headers(int sock, struct req_info *info) {
             die_error(sock, 400, "Bad request");
         }
         /* Empty line, we've reached the end of the headers. */
-        if (strcmp(buf, "\r\n") == 0) {
+        if (buf[0] == 0) {
             break;
         }
 

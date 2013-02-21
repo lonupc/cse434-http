@@ -17,8 +17,18 @@ int recv_getline(int sock, char *buf, int buflen) {
             break;
     }
 
-    *buf = '\0';
-    return (*(buf-1) == '\n');
+    if (*(buf-1) == '\n') {
+        /* Gracefully handle just \n instead of \r\n */
+        if (*(buf-2) == '\r') {
+            *(buf-2) = '\0';
+        } else {
+            *(buf-1) = '\0';
+        }
+        return 1;
+    } else {
+        *buf = '\0';
+        return 0;
+    }
 }
 
 void sendall(int sock, char *buf, int buflen) {

@@ -104,13 +104,13 @@ int main(int argc, char *argv[]) {
 	sendall(sockfd, buf, strlen(buf));
 	
 	// Check for incoming messages
-	rv = recv(sockfd, buf, MAXDATASIZE, 0);
-	if ( rv != 0) {
+	//rv = recv(sockfd, buf, MAXDATASIZE, 0);
+	//if ( rv != 0) {
 		handle_response(sockfd, buf);
 		fp = fopen(fileName, "wb");
 		fprintf(fp, buf);
 		fclose(fp);
-	}
+	//}
 	
 	close(sockfd);
 
@@ -132,6 +132,7 @@ void handle_response(int sock, char* fileToWrite){
 		fprintf(stderr, "Client error receiving file");
 		exit(1);
 	}
+    printf("Got initial header line \"%s\"\n", buf);
 
 	p1 = strstr(buf, " ");
 	if (p1 == NULL){
@@ -140,8 +141,8 @@ void handle_response(int sock, char* fileToWrite){
 	}
 
 	/* If there isn't a normal status code, print it out and exit*/
-	else if (strncmp (p1, "200 OK", 6) != 0){
-		printf("%s", p1);
+	else if (strncmp (p1+1, "200 OK", 6) != 0){
+		printf("Received error: \"%s\"", p1);
 		exit(0);
 	}
 	//If the response is good and we are receiving the file
