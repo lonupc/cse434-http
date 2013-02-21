@@ -32,16 +32,13 @@ void *get_in_addr(struct sockaddr *sa) {
 int main(int argc, char *argv[]) {
 	int sockfd;  
 	char buf[MAXDATASIZE];
-	char *fileName = NULL,
-         *address = NULL,
+	char *fileName,
+         *address,
          *time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	FILE *fp;
 	char s[INET_ADDRSTRLEN];
-
-	// Allocate memory for input formatted inputted arguments
-	time = (char *)malloc(128 * sizeof(char));
 
     /* address and fileName should be freed. */
 	parse_addr(argc, argv, &address, &fileName);
@@ -95,9 +92,10 @@ int main(int argc, char *argv[]) {
 		"User-Agent: customHTTPClient/0.1\r\n",
         fileName, address);
 	
-	if (parse_time(argc, argv, time) == 1) {
+	if (parse_time(argc, argv, &time)) {
 		sprintf(buf+strlen(buf), "If-modified-since: ");
 		sprintf(buf+strlen(buf), time);
+        free(time);
 	}
 	
 	sprintf(buf+strlen(buf), "\r\n\r\n");
@@ -126,8 +124,6 @@ void handle_response(int sock, char* fileToWrite){
 	char buf [HEADER_LINE_SIZE];
 	char *p1;
 	char *p2;
-	char *p3;
-	char lengthStr[32];
 	int length;
 	int n;
 
@@ -164,9 +160,7 @@ void handle_response(int sock, char* fileToWrite){
 		/* The only header we care about is the content length */
 		if (strncmp(buf, "Content-Length", 14) == 0){
 			p2 = buf + 16;
-			p3 = strstr(p2, "\r");
-			strncpy(lengthStr, p2, p3-p2);
-			length = atoi(lengthStr);	
+            length = atoi(p2);
 			}
 		}	
 	}

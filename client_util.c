@@ -1,21 +1,15 @@
 #include "client_util.h"
 #include <string.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <errno.h>
 #include <unistd.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 /*  If there is a command line argument that is not a URL,
 	we assume that it is a time. This manipulates a "time" string
 	and returns 1 if there is a time and 0 if there isn't*/ 
-int parse_time(int argc, char * argv[], char * time){
+int parse_time(int argc, char * argv[], char ** time) {
 	int i;
 
 	for (i = 1; i < argc; i++){
@@ -27,8 +21,8 @@ int parse_time(int argc, char * argv[], char * time){
 	if (i == argc)
 	 	return 0;
 
-	strcpy(time, argv[i]);
-	return 1;
+    *time = strdup(argv[i]);
+	return (*time != NULL);
 }
 
 /* This searchese the arguements and determines if there is a well-formed
@@ -50,7 +44,7 @@ void parse_addr(int argc, char * argv[], char ** address, char ** fileName)
 	}
 
     addrStart = argv[i] + sizeof "http://" - 1;
-    addrEnd = strstr(addrStart, "/");
+    addrEnd = strchr(addrStart, '/');
 	if(addrEnd == NULL) {
 		fprintf(stderr, "Invalid web address and file format\n");
 		exit(1);
@@ -59,6 +53,7 @@ void parse_addr(int argc, char * argv[], char ** address, char ** fileName)
     *fileName = strdup(addrEnd);
     *addrEnd = '\0';
     *address = strdup(addrStart);
+    *addrEnd = '/'; /* Restore argv[i] */
 }
 
 /* Not the most efficient code, reads one byte at a time. But it works. */
