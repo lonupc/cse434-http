@@ -47,8 +47,10 @@ void sendall(int sock, char *buf, int buflen) {
 
 void die_error(int sock, int code, char *desc) {
     char buf[32];
-    printf("Returning status %d.\n", code);
+    char htmlbuf[1024];
+    printf("Returning status %d.\n\n", code);
     snprintf(buf, sizeof buf, "HTTP/1.1 %d ", code);
+    snprintf(htmlbuf, sizeof htmlbuf, ERROR_HTML, code, code, desc);
 
     sendall(sock, buf, strlen(buf));
     sendall(sock, desc, strlen(desc));
@@ -56,7 +58,13 @@ void die_error(int sock, int code, char *desc) {
 
     /* n.b. -1 for the trailing \0 */
     sendall(sock, SERVER_HEADER, sizeof(SERVER_HEADER) - 1);
+
+    snprintf(buf, sizeof buf, "Content-Length: %lu\r\n", (unsigned long)strlen(htmlbuf));
+    sendall(sock, buf, strlen(buf));
     sendall(sock, "\r\n", 2);
+
+    /* Send a helpful friendly HTML file */
+    sendall(sock, htmlbuf, strlen(htmlbuf));
 
     close(sock);
     exit(2);
