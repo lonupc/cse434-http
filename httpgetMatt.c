@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 	snprintf(buf, sizeof buf,
 		"GET %s HTTP/1.1\r\n"
 		"Host: %s\r\n"
-		"Accept: text/plain, text/html"
+		"Accept: text/plain, text/html\r\n"
 		"Accept-Charset: *\r\n"
 		"Accept-Encoding: *\r\n"
 		"AcceptLanguage: en\r\n"
