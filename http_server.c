@@ -1,5 +1,5 @@
-/* Much of the structure of the networking code in main() and do_bind() is from
- * Beej's Guide to Network Programming, at http://beej.us/guide/bgnet/ */
+/* Much of the structure of the networking code in main() and bind_to_self() is
+ * from Beej's Guide to Network Programming, at http://beej.us/guide/bgnet/ */
 #include "header_parse.h"
 #include "server_util.h"
 #include <string.h>
@@ -19,7 +19,7 @@
 #define BACKLOG 10
 
 /* Get a socket and bind to it. */
-int do_bind();
+int bind_to_self();
 /* Reap children left over from fork() */
 void reap_children(int sig);
 /* Utility function for IPv4/IPv6 independence */
@@ -40,7 +40,7 @@ int main() {
 
     getcwd(server_root, sizeof(server_root));
 
-    serv_sock = do_bind();
+    serv_sock = bind_to_self();
 
     if (listen(serv_sock, BACKLOG) == -1) {
         perror("listen");
@@ -152,7 +152,7 @@ void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_
 
 
 
-int do_bind() {
+int bind_to_self() {
     int ret;
 
     struct addrinfo hints;
