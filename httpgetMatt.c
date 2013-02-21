@@ -98,8 +98,13 @@ int main(int argc, char *argv[]) {
 	sendall(sockfd, buf, strlen(buf));
 	
 	// Check for incoming messages
+	rv = recv(sockfd, buf, MAXDATASIZE, 0);
+	if ( rv != 0) {
+		// Check status
+			// Output status if needed
+		// Download new file
 	
-	// Download new file
+	}
 	
 	close(sockfd);
 
