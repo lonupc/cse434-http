@@ -51,6 +51,10 @@ void parse_addr(int argc, char * argv[], char ** address, char ** fileName)
 
     addrStart = argv[i] + sizeof "http://" - 1;
     addrEnd = strstr(addrStart, "/");
+	if(addrEnd == NULL) {
+		fprintf(stderr, "Invalid web address and file format\n");
+		exit(1);
+	}
 
     *fileName = strdup(addrEnd);
     *addrEnd = '\0';
