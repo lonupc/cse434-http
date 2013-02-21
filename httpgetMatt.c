@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	FILE *fp;
 	char s[INET_ADDRSTRLEN];
 
-	parse_addr(argc, argv, &address, &fileName);
+	parse_addr(argc, argv, address, fileName);
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 		"User-Agent: customHTTPClient/0.1\r\n",
         fileName, argv[1]);
 	
-	if (parse_time(argc, argv, &time) == 1) {
+	if (parse_time(argc, argv, time) == 1) {
 		sprintf(buf+strlen(buf), "If-modified-since: ");
 		sprintf(buf+strlen(buf), time);
 	}
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 	// Check for incoming messages
 	rv = recv(sockfd, buf, MAXDATASIZE, 0);
 	if ( rv != 0) {
-		handle_response(sockfd, &buf);
+		handle_response(sockfd, buf);
 		fp = fopen(fileName, "wb");
 		fprintf(fp, buf);
 		fclose(fp);
