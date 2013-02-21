@@ -1,0 +1,9 @@
+GET /somedir/page.html HTTP/1.1
+Host: www.someschool.edu
+Accept: text/plain, text/html
+Accept-Charset: *
+Accept-Encoding: *
+AcceptLanguage: en
+From: twoBerksAndAWilson
+If-Modified-Since: Wednesday, 20-Feb-13 19:15:33 GMT
+User-Agent: customHTTPClient/0.1
