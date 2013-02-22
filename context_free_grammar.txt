@@ -1,0 +1,15 @@
+http_request ::= request_initial_header CrLf Host: {character} {request_header}CfLf
+http_response ::= response_initial_header [{response_header}] CrLf
+
+request_initial_header ::= GET {character} HTTP/1.1\r\n
+request_header ::= request_header_title: {character}CrLf
+request_header_title ::= "Host" | "Accept" | "Accept-Charset" | 
+"Accept-Encoding" | "AcceptLanguage" | "From" | "User-Agent" | "If-modified-since"
+CrLf ::= \r\n
+
+response_initial_header ::= HTTP\1.1 code CfLF
+response_header ::= response_header_title: {character}CrLf
+code = "200 OK" | "304 Not Modified" | "400 Bad request" | "403 Forbidden" |
+"404 Not found" | "405 Method not allowed" | "500 Internal server error" | "501 Not implemented"
+response_header_title :: = "Content-Length" | "Server"
+ 
