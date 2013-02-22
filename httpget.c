@@ -19,6 +19,8 @@ code from Beej's Guide to Network Programming at http://beej.us/guide/bgnet/ */
 #define MAXDATASIZE 16384 // max number of bytes we can get at once 
 #define HEADER_LINE_SIZE 1024 // max header size to read in
 
+#define MIN(a,b) ( ((a)<(b)) ? (a) : (b) )
+
 void handle_response(int sock, char* fileToWrite);
 void *get_in_addr(struct sockaddr *sa);
 
@@ -70,7 +72,7 @@ int main(int argc, char *argv[]) {
 
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 			s, sizeof s);
-	printf("Client: connecting to %s\n.", s);
+	printf("Client: connecting to %s.\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
 	
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]) {
 	
 	// Send HTTP request messages
 	sendall(client_sock, buf, strlen(buf));
-	printf("HTTP request message sent");
+	printf("HTTP request message sent\n");
 	
 	// Read HTTP response message
 	handle_response(client_sock, fileName);
@@ -126,7 +128,7 @@ void handle_response(int sock, char* fileName){
 	char buf [HEADER_LINE_SIZE];
 	char *p1;
 	char *p2;
-	int length;
+	int length = 0;
 	int n;
 	FILE *fp;
 
@@ -138,13 +140,13 @@ void handle_response(int sock, char* fileName){
 
 	p1 = strstr(buf, " ");
 	if (p1 == NULL){
-		fprintf(stderr, "Client error receiving file");
+		fprintf(stderr, "Client error receiving file\n");
 		exit(1);
 	}
 
 	/* If there isn't a normal status code, print it out and exit*/
 	else if (strncmp (p1+1, "200 OK", 6) != 0){
-		printf("Received error: \"%s\"", p1);
+		printf("Received error: \"%s\"\n", p1);
 		exit(0);
 
 	//If the response is good and we are receiving the file
@@ -153,7 +155,7 @@ void handle_response(int sock, char* fileName){
 		
 		while(1){
 			if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
-				fprintf(stderr, "Client error receiving file");
+				fprintf(stderr, "Client error receiving file\n");
 				exit(1);	
 			}
 			
@@ -168,20 +170,24 @@ void handle_response(int sock, char* fileName){
 			}
 		}	
 	}
+
 	/* Open file for reading */
 	fp = fopen(basename(fileName), "wb");
 	
 	/* Get the file conents from the file in parts until entire file
 	   is downloaded */
 	while (length != 0) {
-		n = recv(sock, buf, sizeof(buf)-1, 0);
+		n = recv(sock, buf, MIN(sizeof(buf)-1, (unsigned)length), 0);
+        if (n <= 0) break; /* Error or client closed connection */
         buf[n] = '\0';
 		fputs(buf, fp);
+        fflush(fp);
 		length -= n;
 	}
+    fclose(fp);
 	
-	if (n < 1){
-		fprintf(stderr, "Client Error receiving file");
+	if (n < 0){
+        perror("Client Error receiving file");
 	}
 	printf("File written.\n");
 }
