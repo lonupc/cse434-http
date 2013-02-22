@@ -107,9 +107,10 @@ int main(int argc, char *argv[]) {
 	//rv = recv(sockfd, buf, MAXDATASIZE, 0);
 	//if ( rv != 0) {
 		handle_response(sockfd, buf);
-		printf(buf);
-		fp = fopen(fileName, "wb");
-		fprintf(fp, buf);
+		//printf(buf);
+		fp = fopen(basename(fileName), "wb");
+		//fprintf(fp, buf);
+		fputs(buf, fp);
 		fclose(fp);
 	//}
 	
