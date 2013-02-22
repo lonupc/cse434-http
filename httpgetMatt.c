@@ -158,7 +158,7 @@ void handle_response(int sock, char* fileToWrite){
 		}
 		
 		/* We've reached the end of the headers */
-		if (*buf == NULL){
+		if (*buf == '\0'){
 			break;
 		}
 		/* The only header we care about is the content length */
