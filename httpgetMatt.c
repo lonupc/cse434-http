@@ -171,7 +171,8 @@ void handle_response(int sock, char* fileName){
 	fp = fopen(basename(fileName), "wb");
 	
 	while (length != 0) {
-		n = recv(sock, buf, sizeof(buf), 0);
+		n = recv(sock, buf, sizeof(buf)-1, 0);
+        buf[n] = '\0';
 		fputs(buf, fp);
 		length -= n;
 	}
