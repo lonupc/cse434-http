@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 
 int parse_headers(int sock, struct req_info *info) {
@@ -15,10 +16,14 @@ int parse_headers(int sock, struct req_info *info) {
     char *p1,
          *p2,
          *p3;
+    int st;
 
 
-    if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
+    if ((st = recv_getline(sock, buf, HEADER_LINE_SIZE)) < 0) {
         die_error(sock, 400, "Bad request");
+    } else if (st == 0) {
+        close(sock);
+        exit(0);
     }
 
     p1 = strstr(buf, " ");
@@ -37,9 +42,17 @@ int parse_headers(int sock, struct req_info *info) {
     info->resource = strdup(p1);
     info->http_ver = strdup(p2+1);
 
+    /* HTTP/1.1 defaults to persistent connections */
+    if (strcmp(info->http_ver, "HTTP/1.1") == 0) {
+        info->want_persistent = 1;
+    }
+
     while (1) {
-        if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
+        if ((st = recv_getline(sock, buf, HEADER_LINE_SIZE)) < 0) {
             die_error(sock, 400, "Bad request");
+        } else if (st == 0) {
+            close(sock);
+            exit(0);
         }
         /* Empty line, we've reached the end of the headers. */
         if (buf[0] == 0) {
@@ -55,7 +68,9 @@ int parse_headers(int sock, struct req_info *info) {
         ++p3;
         while (isspace(*p3)) ++p3; /* Find start of header value */
 
-        parse_single_header(p1, p3, info);
+        if (!parse_single_header(p1, p3, info)) {
+            die_error(sock, 501, "Not implemented");
+        }
 
     }
 
@@ -67,7 +82,7 @@ int parse_headers(int sock, struct req_info *info) {
     return 1;
 }
 
-void parse_single_header(char *key, char *val, struct req_info *info) {
+int parse_single_header(char *key, char *val, struct req_info *info) {
     if (strcasecmp(key, "If-Modified-Since") == 0) {
         info->if_modified_since = malloc(sizeof(*info->if_modified_since));
         if (!info->if_modified_since) {
@@ -91,6 +106,20 @@ void parse_single_header(char *key, char *val, struct req_info *info) {
     if (strcasecmp(key, "Host") == 0) {
         info->found_host = 1;
     }
+    if (strcasecmp(key, "Connection") == 0) {
+        if (strcmp(val, "close") == 0) {
+            info->want_persistent = 0;
+        }
+        else if (strcmp(val, "Keep-Alive") == 0) {
+            info->want_persistent = 1;
+        }
+    }
+    /* Cookies are explicitly not supported */
+    if (strcasecmp(key, "Cookie") == 0) {
+        return 0;
+    }
+    /* Ignore all other headers */
+    return 1;
 }
 
 
@@ -111,10 +140,13 @@ char *parse_time(char *timestr, struct tm *out) {
 }
 
 void setup_req_info(struct req_info *info) {
+    /* I set all the pointers to NULL in case they're not set when I free them
+     * in clear_req_info(). free(NULL) is a nop, by the standard. */
     info->method = INVALID;
     info->resource = NULL;
     info->http_ver = NULL;
     info->user_agent = NULL;
+    info->want_persistent = 0;
     info->found_host = 0;
     info->if_modified_since = NULL;
 }
