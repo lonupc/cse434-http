@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 
 int parse_headers(int sock, struct req_info *info) {
@@ -15,10 +16,14 @@ int parse_headers(int sock, struct req_info *info) {
     char *p1,
          *p2,
          *p3;
+    int st;
 
 
-    if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
+    if ((st = recv_getline(sock, buf, HEADER_LINE_SIZE)) < 0) {
         die_error(sock, 400, "Bad request");
+    } else if (st == 0) {
+        close(sock);
+        exit(0);
     }
 
     p1 = strstr(buf, " ");
@@ -43,8 +48,11 @@ int parse_headers(int sock, struct req_info *info) {
     }
 
     while (1) {
-        if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
+        if ((st = recv_getline(sock, buf, HEADER_LINE_SIZE)) < 0) {
             die_error(sock, 400, "Bad request");
+        } else if (st == 0) {
+            close(sock);
+            exit(0);
         }
         /* Empty line, we've reached the end of the headers. */
         if (buf[0] == 0) {

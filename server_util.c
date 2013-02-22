@@ -12,7 +12,7 @@ int recv_getline(int sock, char *buf, int buflen) {
 
     while (i++ < buflen-1) {
         n = recv(sock, buf, 1, 0);
-        if (n < 1) return 0;
+        if (n < 1) return n;
         if (*buf++ == '\n')
             break;
     }
@@ -27,7 +27,7 @@ int recv_getline(int sock, char *buf, int buflen) {
         return 1;
     } else {
         *buf = '\0';
-        return 0;
+        return -1;
     }
 }
 
