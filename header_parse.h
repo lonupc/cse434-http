@@ -6,13 +6,15 @@
 #include <time.h>
 
 /* For now we only support GET */
-enum req_method { GET };
+enum req_method { INVALID, GET };
 
 struct req_info {
     enum req_method method;
     char *resource;
-    char *user_agent;
+    char *http_ver;
 
+    char *user_agent;
+    int found_host;
     struct tm *if_modified_since;
 };
 

@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE /* for strptime */
+#define _XOPEN_SOURCE_EXTENDED /* for strdup */
 #include "server_util.h"
 #include "header_parse.h"
 #include <time.h>
@@ -31,15 +32,10 @@ int parse_headers(int sock, struct req_info *info) {
     if (p2 == NULL) {
         die_error(sock, 400, "Bad request");
     }
+    *p2 = '\0';
 
-    info->resource = malloc((p2-p1) + 1);
-    if (info->resource == NULL) {
-        die_error(sock, 500, "Internal server error");
-    }
-    strncpy(info->resource, p1, p2-p1);
-    info->resource[p2-p1] = '\0';
-
-
+    info->resource = strdup(p1);
+    info->http_ver = strdup(p2+1);
 
     while (1) {
         if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
@@ -61,6 +57,11 @@ int parse_headers(int sock, struct req_info *info) {
 
         parse_single_header(p1, p3, info);
 
+    }
+
+    /* HTTP/1.1 explicitly requires the Host: header */
+    if (strcasecmp(info->http_ver, "HTTP/1.1") == 0 && !info->found_host) {
+        die_error(sock, 400, "Bad request");
     }
 
     return 1;
@@ -87,6 +88,9 @@ void parse_single_header(char *key, char *val, struct req_info *info) {
             fputs("Out of memory\n", stderr);
         }
     }
+    if (strcasecmp(key, "Host") == 0) {
+        info->found_host = 1;
+    }
 }
 
 
@@ -107,14 +111,16 @@ char *parse_time(char *timestr, struct tm *out) {
 }
 
 void setup_req_info(struct req_info *info) {
-    info->resource =
-        info->user_agent =
-        NULL;
-    info->if_modified_since =
-        NULL;
+    info->method = INVALID;
+    info->resource = NULL;
+    info->http_ver = NULL;
+    info->user_agent = NULL;
+    info->found_host = 0;
+    info->if_modified_since = NULL;
 }
 void clear_req_info(struct req_info *info) {
     free(info->resource);
+    free(info->http_ver);
     free(info->user_agent);
     free(info->if_modified_since);
     setup_req_info(info);

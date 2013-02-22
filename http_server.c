@@ -95,9 +95,9 @@ void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_
     parse_headers(sock, &info);
 
     if (info.user_agent) {
-        printf("User agent \"%s\" requested \"%s\"\n", info.user_agent, info.resource);
+        printf("User agent \"%s\" requested \"%s\" with %s\n", info.user_agent, info.resource, info.http_ver);
     } else {
-        printf("Got request \"%s\"\n", info.resource);
+        printf("Got request \"%s\" with %s\n", info.resource, info.http_ver);
     }
     strncat(serv_root, info.resource, serv_root_len - strlen(serv_root) - 1);
 
