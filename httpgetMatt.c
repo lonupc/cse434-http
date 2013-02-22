@@ -107,6 +107,7 @@ int main(int argc, char *argv[]) {
 	//rv = recv(sockfd, buf, MAXDATASIZE, 0);
 	//if ( rv != 0) {
 		handle_response(sockfd, buf);
+		printf(buf);
 		fp = fopen(fileName, "wb");
 		fprintf(fp, buf);
 		fclose(fp);
@@ -154,8 +155,9 @@ void handle_response(int sock, char* fileToWrite){
 			fprintf(stderr, "Client error receiving file");
 			exit(1);	
 		}
+		
 		/* We've reached the end of the headers */
-		if (strcmp(buf, "\r\n") == 0){
+		if (*buf == NULL){
 			break;
 		}
 		/* The only header we care about is the content length */
