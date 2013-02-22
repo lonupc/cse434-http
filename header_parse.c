@@ -37,6 +37,11 @@ int parse_headers(int sock, struct req_info *info) {
     info->resource = strdup(p1);
     info->http_ver = strdup(p2+1);
 
+    /* HTTP/1.1 defaults to persistent connections */
+    if (strcmp(info->http_ver, "HTTP/1.1") == 0) {
+        info->want_persistent = 1;
+    }
+
     while (1) {
         if (!recv_getline(sock, buf, HEADER_LINE_SIZE)) {
             die_error(sock, 400, "Bad request");
@@ -93,6 +98,14 @@ int parse_single_header(char *key, char *val, struct req_info *info) {
     if (strcasecmp(key, "Host") == 0) {
         info->found_host = 1;
     }
+    if (strcasecmp(key, "Connection") == 0) {
+        if (strcmp(val, "close") == 0) {
+            info->want_persistent = 0;
+        }
+        else if (strcmp(val, "Keep-Alive") == 0) {
+            info->want_persistent = 1;
+        }
+    }
     /* Cookies are explicitly not supported */
     if (strcasecmp(key, "Cookie") == 0) {
         return 0;
@@ -125,6 +138,7 @@ void setup_req_info(struct req_info *info) {
     info->resource = NULL;
     info->http_ver = NULL;
     info->user_agent = NULL;
+    info->want_persistent = 0;
     info->found_host = 0;
     info->if_modified_since = NULL;
 }

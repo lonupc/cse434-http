@@ -14,6 +14,7 @@ struct req_info {
     char *http_ver;
 
     char *user_agent;
+    int want_persistent;
     int found_host;
     struct tm *if_modified_since;
 };

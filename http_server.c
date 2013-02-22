@@ -25,7 +25,7 @@ void reap_children(int sig);
 /* Utility function for IPv4/IPv6 independence */
 void *get_in_addr(struct sockaddr *sa);
 /* Main service function */
-void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_root_len);
+void serve(int sock, struct sockaddr_storage addr, char *serv_root);
 
 
 int main() {
@@ -67,7 +67,7 @@ int main() {
         if (!fork()) {
             /* Client process */
             close(serv_sock);
-            serve(client_sock, client_addr, server_root, sizeof(server_root));
+            serve(client_sock, client_addr, server_root);
             exit(0);
         }
 
@@ -79,86 +79,94 @@ int main() {
 }
 
 
-void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_root_len) {
+void serve(int sock, struct sockaddr_storage addr, char *serv_root) {
     char s[INET6_ADDRSTRLEN];
     struct req_info info;
-    struct stat stat_buf;
     FILE *fp;
     char buf[1024];
-    size_t nread;
+    int persistent_request;
 
     inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr),
             s, sizeof s);
     printf("Got connection from %s\n", s);
     setup_req_info(&info);
 
-    parse_headers(sock, &info);
+    /* Persistent request loop */
+    do {
+        struct stat stat_buf;
 
-    if (info.user_agent) {
-        printf("User agent \"%s\" requested \"%s\" with %s\n", info.user_agent, info.resource, info.http_ver);
-    } else {
-        printf("Got request \"%s\" with %s\n", info.resource, info.http_ver);
-    }
-    strncat(serv_root, info.resource, serv_root_len - strlen(serv_root) - 1);
+        parse_headers(sock, &info);
+
+        if (info.user_agent) {
+            printf("User agent \"%s\" requested \"%s\" with %s\n", info.user_agent, info.resource, info.http_ver);
+        } else {
+            printf("Got request \"%s\" with %s\n", info.resource, info.http_ver);
+        }
+
+        strncpy(buf, serv_root, sizeof buf);
+        strncat(buf, info.resource, sizeof buf - strlen(buf) - 1);
 
 
 considered_harmful:
-    /* I could clean up this path, but I don't even care.
-     * Security? Who needs it?
-     */
-    printf("Offering file \"%s\"\n", serv_root);
-    if (stat(serv_root, &stat_buf) == -1) {
-        if (errno == ENOENT) {
-            die_error(sock, 404, "Not found");
+        /* I could clean up this path, but I don't even care.
+         * Security? Who needs it?
+         */
+        printf("Offering file \"%s\"\n", buf);
+        if (stat(buf, &stat_buf) == -1) {
+            if (errno == ENOENT) {
+                die_error(sock, 404, "Not found");
+            }
+            if (errno == EACCES) {
+                die_error(sock, 403, "Forbidden");
+            }
+            printf("died on line %d\nerrno = %s\n", __LINE__, strerror(errno));
+            die_error(sock, 500, "Internal server error");
         }
-        if (errno == EACCES) {
+
+        /* Is it world-readable? */
+        if ((stat_buf.st_mode & 0004) == 0) {
             die_error(sock, 403, "Forbidden");
         }
-        die_error(sock, 500, "Internal server error");
-    }
 
-    /* Is it world-readable? */
-    if ((stat_buf.st_mode & 0004) == 0) {
-        die_error(sock, 403, "Forbidden");
-    }
-
-    /* We only support regular files */
-    if (!S_ISREG(stat_buf.st_mode)) {
-        /* If it's a directory, we'll try again */
-        if (S_ISDIR(stat_buf.st_mode)) {
-            strncat(serv_root, "/index.html", serv_root_len - strlen(serv_root) - 1);
-            goto considered_harmful;
+        /* We only support regular files */
+        if (!S_ISREG(stat_buf.st_mode)) {
+            /* If it's a directory, we'll try again */
+            if (S_ISDIR(stat_buf.st_mode)) {
+                strncat(buf, "index.html", sizeof buf - strlen(buf) - 1);
+                goto considered_harmful;
+            }
+            die_error(sock, 500, "Internal server error");
         }
-        die_error(sock, 500, "Internal server error");
-    }
 
-    if (info.if_modified_since) {
-        time_t tmp = mktime(info.if_modified_since);
-        if (tmp != -1 && tmp < stat_buf.st_mtime) {
-            die_error(sock, 304, "Not modified");
+        if (info.if_modified_since) {
+            time_t tmp = mktime(info.if_modified_since);
+            if (tmp != -1 && tmp < stat_buf.st_mtime) {
+                die_error(sock, 304, "Not modified");
+            }
         }
-    }
 
-    /* OK, from this point forth, we know the file's ok. */
-    if (!(fp = fopen(serv_root, "rb"))) {
-        die_error(sock, 500, "Internal server error");
-    }
+        /* OK, from this point forth, we know the file's ok. */
+        if (!(fp = fopen(buf, "rb"))) {
+            die_error(sock, 500, "Internal server error");
+        }
 
-    snprintf(buf, sizeof buf, "HTTP/1.1 200 OK\r\n"
-            SERVER_HEADER
-            "Content-Length: %lu\r\n"
-            "\r\n",
-            (unsigned long)stat_buf.st_size);
+        snprintf(buf, sizeof buf, "HTTP/1.1 200 OK\r\n"
+                SERVER_HEADER
+                "Content-Length: %lu\r\n"
+                "\r\n",
+                (unsigned long)stat_buf.st_size);
 
-    sendall(sock, buf, strlen(buf));
-    printf("Sent headers:\n%s", buf);
+        sendall(sock, buf, strlen(buf));
+        printf("Sent headers:\n%s", buf);
 
-    while (!feof(fp) && !ferror(fp)) {
-        nread = fread(buf, 1, sizeof buf, fp);
-        sendall(sock, buf, nread);
-    }
+        while (!feof(fp) && !ferror(fp)) {
+            size_t nread = fread(buf, 1, sizeof buf, fp);
+            sendall(sock, buf, nread);
+        }
 
-    clear_req_info(&info);
+        persistent_request = info.want_persistent;
+        clear_req_info(&info);
+    } while (persistent_request);
 
     close(sock);
 }
