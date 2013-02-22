@@ -9,10 +9,10 @@
 #include <sys/socket.h>
 #include "client_util.h"
 #include <arpa/inet.h>
-
+#include <libgen.h>
 #define PORT "http" // the port client will be connecting to 
 
-#define MAXDATASIZE 1024 // max number of bytes we can get at once 
+#define MAXDATASIZE 16384 // max number of bytes we can get at once 
 #define HEADER_LINE_SIZE 1024
 
 void handle_response(int sock, char* fileToWrite);
@@ -37,7 +37,6 @@ int main(int argc, char *argv[]) {
          *time;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
-	FILE *fp;
 	char s[INET_ADDRSTRLEN];
 
     /* address and fileName should be freed. */
@@ -106,12 +105,11 @@ int main(int argc, char *argv[]) {
 	// Check for incoming messages
 	//rv = recv(sockfd, buf, MAXDATASIZE, 0);
 	//if ( rv != 0) {
-		handle_response(sockfd, buf);
-		//printf(buf);
-		fp = fopen(basename(fileName), "wb");
-		//fprintf(fp, buf);
-		fputs(buf, fp);
-		fclose(fp);
+		handle_response(sockfd, fileName);
+		//fp = fopen(basename(fileName), "wb");
+		//printf("Output: %d.", fputs(buf, fp));
+		//printf("File written.");
+		//fclose(fp);
 	//}
 	
 	close(sockfd);
@@ -122,12 +120,13 @@ int main(int argc, char *argv[]) {
 If there is an error message, it prints it. If not, it reads the file,
 and returns the string that needs to be written to fileToWrite
 */
-void handle_response(int sock, char* fileToWrite){
+void handle_response(int sock, char* fileName){
 	char buf [HEADER_LINE_SIZE];
 	char *p1;
 	char *p2;
 	int length;
 	int n;
+	FILE *fp;
 
 
 	if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
@@ -168,11 +167,17 @@ void handle_response(int sock, char* fileToWrite){
 			}
 		}	
 	}
-	/* Read the file  from the buffer*/
-	n = recv(sock, fileToWrite, length, 0);
+	/* Read the file  from the buffer, and write to file*/
+	fp = fopen(basename(fileName), "wb");
+	
+	while (length != 0) {
+		n = recv(sock, buf, sizeof(buf), 0);
+		fputs(buf, fp);
+		length -= n;
+	}
 	if (n < 1){
 	fprintf(stderr, "Client Error receiving file");
-	
 	}
+	printf("File written.");
 }
 
