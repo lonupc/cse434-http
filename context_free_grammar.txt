@@ -10,11 +10,8 @@ accept_l_h ::= Accept-Language: character {character}CrLf
 accept_from_h ::= From: character {character}CrLf
 accept_user_h ::= User-Agent: character {character}CrLf
 accept_modified ::= If-modified-since: character {character}CrLf
-
 acceptable_encod ::= "iso-8859-1" | "utf-8"CrLf
 CrLf ::= \r\n
-
-
 
 http_response ::= response_initial_header [{response_header}] CrLf
 response_initial_header ::= HTTP\1.1 code CfLF
@@ -26,3 +23,7 @@ response_header_title ::= "Content-Length" | "Server"
 content_h ::= Content-Length: digit {digit}CrLf
 server_h ::= Server: character {character}CrLf
 
+sources:
+http://www.w3.org/Notation.html
+http://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form
+http://en.wikipedia.org/wiki/List_of_HTTP_headers
