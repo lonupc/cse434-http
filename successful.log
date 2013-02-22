@@ -1,0 +1,12 @@
+21:42:48.458162 IP6 localhost.localdomain.47621 > localhost.localdomain.http: Flags [S], seq 2143035624, win 43690, options [mss 65476,sackOK,TS val 9808844 ecr 0,nop,wscale 7], length 0
+21:42:48.458201 IP6 localhost.localdomain.http > localhost.localdomain.47621: Flags [R.], seq 0, ack 2143035625, win 0, length 0
+21:42:48.458580 IP localhost.localdomain.35970 > localhost.localdomain.http: Flags [S], seq 2465856572, win 43690, options [mss 65495,sackOK,TS val 9808844 ecr 0,nop,wscale 7], length 0
+21:42:48.458760 IP localhost.localdomain.http > localhost.localdomain.35970: Flags [S.], seq 1544357531, ack 2465856573, win 43690, options [mss 65495,sackOK,TS val 9808844 ecr 9808844,nop,wscale 7], length 0
+21:42:48.458807 IP localhost.localdomain.35970 > localhost.localdomain.http: Flags [.], ack 1, win 342, options [nop,nop,TS val 9808844 ecr 9808844], length 0
+21:42:48.460111 IP localhost.localdomain.35970 > localhost.localdomain.http: Flags [P.], seq 1:198, ack 1, win 342, options [nop,nop,TS val 9808844 ecr 9808844], length 197
+21:42:48.461324 IP localhost.localdomain.http > localhost.localdomain.35970: Flags [.], ack 198, win 350, options [nop,nop,TS val 9808845 ecr 9808844], length 0
+21:42:48.461951 IP localhost.localdomain.http > localhost.localdomain.35970: Flags [P.], seq 1:65, ack 198, win 350, options [nop,nop,TS val 9808845 ecr 9808844], length 64
+21:42:48.462148 IP localhost.localdomain.http > localhost.localdomain.35970: Flags [FP.], seq 65:334, ack 198, win 350, options [nop,nop,TS val 9808845 ecr 9808844], length 269
+21:42:48.463357 IP localhost.localdomain.35970 > localhost.localdomain.http: Flags [.], ack 65, win 342, options [nop,nop,TS val 9808845 ecr 9808845], length 0
+21:42:48.464782 IP localhost.localdomain.35970 > localhost.localdomain.http: Flags [R.], seq 198, ack 335, win 350, options [nop,nop,TS val 9808846 ecr 9808845], length 0
+
