@@ -1,6 +1,10 @@
-cse434-http
-===========
+Louis Wilson
+Nick Berk
+Matt Berk
 
-Simple HTTP client &amp; server
+How to run:
+1. Run make
+2. Run http_server
+3. Run httpget with an address as an argument
 
-Good stuff.
+The testing information is contained in testingDocument
