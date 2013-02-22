@@ -1,124 +1,188 @@
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
+/* A lot of the code in main for connecting to the host is structured using
+code from Beej's Guide to Network Programming at http://beej.us/guide/bgnet/ */
+
 #include <arpa/inet.h>
-#include <netdb.h>
 #include <errno.h>
-#include <unistd.h>
-#include <signal.h>
+#include <libgen.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#define PORT "http"
-#define BACKLOG 10
+#include "client_util.h"
 
-/* Get a socket and bind to it. */
-int do_bind();
+#define PORT "http" // the port client will be connecting to 
+#define MAXDATASIZE 16384 // max number of bytes we can get at once 
+#define HEADER_LINE_SIZE 1024 // max header size to read in
 
-/* Parses the headers and sets the address and the file Name */
-void parseAddr(int argc, char * argv[], char * address, char * fileName);
+void handle_response(int sock, char* fileToWrite);
+void *get_in_addr(struct sockaddr *sa);
+
 
 int main(int argc, char *argv[]) {
-	int serv_sock;
-	int client_sock;
-	struct sockaddr_storage client_addr;
-	char * address, fileName;
+	int client_sock;  
+	char buf[MAXDATASIZE];
+	char *fileName,
+         *address,
+         *time;
+	struct addrinfo hints, *servinfo, *p;
+	int rv;
+	char s[INET_ADDRSTRLEN];
 
-	client_sock = do_bind();
-	praseAddr(argc, argv[], address, fileName);
-	
-	
-	
-	
-	
+    /* address and fileName should be freed. */
+	parse_addr(argc, argv, &address, &fileName);
 
-	//argc is the number of arguements passed into the command line
-	//argv[1] is the first arguement
+	memset(&hints, 0, sizeof hints);	// Make sure hints is empty
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
 
-	//Connect to the server
+	// Get Address info
+	if ((rv = getaddrinfo(address, PORT, &hints, &servinfo)) != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+		return 1;
+	}
 
+	// Connect to first result possible
+	for(p = servinfo; p != NULL; p = p->ai_next) {
+		if ((client_sock = socket(p->ai_family, p->ai_socktype,
+				p->ai_protocol)) == -1) {
+			perror("client: socket");
+			continue;
+		}
 
+		if (connect(client_sock, p->ai_addr, p->ai_addrlen) == -1) {
+			close(client_sock);
+			perror("client: connect");
+			continue;
+		}
+
+		break;
+	}
+
+	if (p == NULL) {
+		fprintf(stderr, "client: failed to connect\n");
+		return 2;
+	}
+
+	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+			s, sizeof s);
+	printf("Client: connecting to %s\n.", s);
+
+	freeaddrinfo(servinfo); // all done with this structure
 	
+	// Create HTTP request message using inputted args
+	snprintf(buf, sizeof buf,
+		"GET %s HTTP/1.1\r\n"
+		"Host: %s\r\n"
+		"Accept: text/plain, text/html\r\n"
+		"Accept-Charset: *\r\n"					// Set to '*' for simplicity
+		"Accept-Encoding: *\r\n"				// Set to '*' for simplicity
+		"AcceptLanguage: en\r\n"
+		"From: twoBerksAndAWilson\r\n"
+		"User-Agent: customHTTPClient/0.1\r\n",
+        fileName, address);
+	
+	// If time is resent in the command ling arguments, add If-modified-since header
+	if (parse_time(argc, argv, &time)) {
+		sprintf(buf+strlen(buf), "If-modified-since: ");
+		sprintf(buf+strlen(buf), time);
+        free(time);
+	}
+	
+	// Add crlf to end HTTP request message
+	sprintf(buf+strlen(buf), "\r\n\r\n");
+	
+	// Send HTTP request messages
+	sendall(client_sock, buf, strlen(buf));
+	printf("HTTP request message sent");
+	
+	// Read HTTP response message
+	handle_response(client_sock, fileName);
+	
+	// Close socket
+	close(client_sock);
 
+	return 0;
 }
 
-/* Parse the command line arguements and return an array with the
-IP address (in the first string), and the file name (in the second string) */
-
-void parseAddr(int argc, char * argv[], char * address, char * fileName){
-	int i;
-
-	for(i = 0; i < argc; i++){
-		if (!strncmp ("http://", argv[i], 7))
-			break;
-	}
-	if (i == argc){
-	 perror("No valid web address");
-        exit(1);
+// Get address for the socket
+void *get_in_addr(struct sockaddr *sa) {
+	if (sa->sa_family == AF_INET) {
+		return &(((struct sockaddr_in*)sa)->sin_addr);
 	}
 
-	strtok(argv[i], "/");
-	strtok(argv[i], "/");
-	
-	//At this point we should be through the "http://"
-	address = strtok(argv[i], "/");
-	if (!address || strcmp(address, ""){
-		fprintf(stderr, "No valid address.\n");
-		exit(1);
-		}
-	fileName = strtok(argv[i], "/");
-	if (!fileName || strcmp(fileName, ""){
-		fprintf(stderr, "Error: No Valid File Name.\n");
-		exit(1);
-		}
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-/* This creates a socket (copied from Lewis's file), but does not bind.
-It is not necessary to bind in the client*/
+/* Handles all the logic associated with the header response file. 
+If there is an error message, it prints it. If not, it reads the file,
+and returns the string that needs to be written to fileToWrite
+*/
+void handle_response(int sock, char* fileName){
+	char buf [HEADER_LINE_SIZE];
+	char *p1;
+	char *p2;
+	int length;
+	int n;
+	FILE *fp;
 
-int do_bind() {
-    int ret;
+	if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
+		fprintf(stderr, "Client error receiving file");
+		exit(1);
+	}
+    printf("Got initial header line \"%s\"\n", buf);
 
-    struct addrinfo hints;
-    struct addrinfo *servinfo,
-                    *p;
-    int status;
-    int yes = 1;
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; /* IPv4 or IPv6 */
-    hints.ai_socktype = SOCK_STREAM; /* TCP */
-    hints.ai_flags = AI_PASSIVE; /* bind to myself */
-    if ((status = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-        exit(1);
-    }
-
-    for (p = servinfo; p != NULL; p = p->ai_next) {
-        /* Get me a socket! */
-        if ((ret = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-            perror("socket");
-            continue;
-        }
-
-        /* Lose "Address already in use" message */
-        if (setsockopt(ret, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-            perror("setsockopt");
-            exit(1);
-        }
-        
-        /* Try to bind to the socket */
-           break;
+	p1 = strstr(buf, " ");
+	if (p1 == NULL){
+		fprintf(stderr, "Client error receiving file");
+		exit(1);
 	}
 
-    if (p == NULL) {
-        fprintf(stderr, "Error: failed to bind to a port.\n");
-        exit(1);
-    }
+	/* If there isn't a normal status code, print it out and exit*/
+	else if (strncmp (p1+1, "200 OK", 6) != 0){
+		printf("Received error: \"%s\"", p1);
+		exit(0);
 
-    freeaddrinfo(servinfo);
-    return ret;
+	//If the response is good and we are receiving the file
+	} else{
+		printf("Reading File\n");
+		
+		while(1){
+			if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
+				fprintf(stderr, "Client error receiving file");
+				exit(1);	
+			}
+			
+			/* We've reached the end of the headers */
+			if (*buf == '\0'){
+				break;
+			}
+			/* The only header we care about is the content length */
+			if (strncmp(buf, "Content-Length", 14) == 0){
+				p2 = buf + 16;
+				length = atoi(p2);
+			}
+		}	
+	}
+	/* Open file for reading */
+	fp = fopen(basename(fileName), "wb");
+	
+	/* Get the file conents from the file in parts until entire file
+	   is downloaded */
+	while (length != 0) {
+		n = recv(sock, buf, sizeof(buf)-1, 0);
+        buf[n] = '\0';
+		fputs(buf, fp);
+		length -= n;
+	}
+	
+	if (n < 1){
+		fprintf(stderr, "Client Error receiving file");
+	}
+	printf("File written.\n");
 }
 
