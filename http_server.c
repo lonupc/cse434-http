@@ -102,9 +102,11 @@ void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_
     strncat(serv_root, info.resource, serv_root_len - strlen(serv_root) - 1);
 
 
+considered_harmful:
     /* I could clean up this path, but I don't even care.
      * Security? Who needs it?
      */
+    printf("Offering file \"%s\"\n", serv_root);
     if (stat(serv_root, &stat_buf) == -1) {
         if (errno == ENOENT) {
             die_error(sock, 404, "Not found");
@@ -118,6 +120,16 @@ void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_
     /* Is it world-readable? */
     if ((stat_buf.st_mode & 0004) == 0) {
         die_error(sock, 403, "Forbidden");
+    }
+
+    /* We only support regular files */
+    if (!S_ISREG(stat_buf.st_mode)) {
+        /* If it's a directory, we'll try again */
+        if (S_ISDIR(stat_buf.st_mode)) {
+            strncat(serv_root, "/index.html", serv_root_len - strlen(serv_root) - 1);
+            goto considered_harmful;
+        }
+        die_error(sock, 500, "Internal server error");
     }
 
     if (info.if_modified_since) {
@@ -139,6 +151,7 @@ void serve(int sock, struct sockaddr_storage addr, char *serv_root, size_t serv_
             (unsigned long)stat_buf.st_size);
 
     sendall(sock, buf, strlen(buf));
+    printf("Sent headers:\n%s", buf);
 
     while (!feof(fp) && !ferror(fp)) {
         nread = fread(buf, 1, sizeof buf, fp);
