@@ -1,15 +1,28 @@
-http_request ::= request_initial_header CrLf Host: {character} {request_header}CfLf
-http_response ::= response_initial_header [{response_header}] CrLf
-
+http_request ::= request_initial_header CrLf host_h{request_header}CfLf
 request_initial_header ::= GET {character} HTTP/1.1\r\n
-request_header ::= request_header_title: {character}CrLf
-request_header_title ::= "Host" | "Accept" | "Accept-Charset" | 
-"Accept-Encoding" | "AcceptLanguage" | "From" | "User-Agent" | "If-modified-since"
+request_header ::=  accept_h | accept_c_h | accept_e_h | accept_l_h | accept_from_h | accept_user_h | accept_modified
+
+host_h ::= Host: character {character}CrLf
+accept_h ::= Accept: "*"CrLf
+accept_c_h ::= Accept-Charset: character {character}CrLf
+accept_e_h ::= Accept-Encoding: acceptable_enc [, acceptable_enc]CrLf
+accept_l_h ::= Accept-Language: character {character}CrLf
+accept_from_h ::= From: character {character}CrLf
+accept_user_h ::= User-Agent: character {character}CrLf
+accept_modified ::= If-modified-since: character {character}CrLf
+
+acceptable_encod ::= "iso-8859-1" | "utf-8"CrLf
 CrLf ::= \r\n
 
+
+
+http_response ::= response_initial_header [{response_header}] CrLf
 response_initial_header ::= HTTP\1.1 code CfLF
-response_header ::= response_header_title: {character}CrLf
+response_header ::= content_h | sever_h
 code = "200 OK" | "304 Not Modified" | "400 Bad request" | "403 Forbidden" |
 "404 Not found" | "405 Method not allowed" | "500 Internal server error" | "501 Not implemented"
-response_header_title :: = "Content-Length" | "Server"
- 
+response_header_title ::= "Content-Length" | "Server"
+
+content_h ::= Content-Length: digit {digit}CrLf
+server_h ::= Server: character {character}CrLf
+
