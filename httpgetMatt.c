@@ -102,15 +102,7 @@ int main(int argc, char *argv[]) {
 	// Send HTTP request messages
 	sendall(sockfd, buf, strlen(buf));
 	
-	// Check for incoming messages
-	//rv = recv(sockfd, buf, MAXDATASIZE, 0);
-	//if ( rv != 0) {
-		handle_response(sockfd, fileName);
-		//fp = fopen(basename(fileName), "wb");
-		//printf("Output: %d.", fputs(buf, fp));
-		//printf("File written.");
-		//fclose(fp);
-	//}
+	handle_response(sockfd, fileName);
 	
 	close(sockfd);
 
@@ -148,7 +140,7 @@ void handle_response(int sock, char* fileName){
 	}
 	//If the response is good and we are receiving the file
 	else{
-		printf("Reading File");
+		printf("Reading File\n");
 		
 	while(1){
 		if (!recv_getline(sock, buf, HEADER_LINE_SIZE)){
@@ -178,6 +170,6 @@ void handle_response(int sock, char* fileName){
 	if (n < 1){
 	fprintf(stderr, "Client Error receiving file");
 	}
-	printf("File written.");
+	printf("File written.\n");
 }
 
