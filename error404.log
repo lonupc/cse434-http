@@ -1,21 +1,51 @@
-21:50:25.981898 IP6 (hlim 64, next-header TCP (6) payload length: 40) ::1.47638 > ::1.80: Flags [S], cksum 0x0030 (incorrect -> 0xbc6b), seq 825439921, win 43690, options [mss 65476,sackOK,TS val 9946101 ecr 0,nop,wscale 7], length 0
-21:50:25.981940 IP6 (hlim 64, next-header TCP (6) payload length: 20) ::1.80 > ::1.47638: Flags [R.], cksum 0x001c (incorrect -> 0x8d83), seq 0, ack 825439922, win 0, length 0
-21:50:25.982306 IP (tos 0x0, ttl 64, id 33798, offset 0, flags [DF], proto TCP (6), length 60)
-    127.0.0.1.35987 > 127.0.0.1.80: Flags [S], cksum 0xfe30 (incorrect -> 0xa084), seq 1799833587, win 43690, options [mss 65495,sackOK,TS val 9946101 ecr 0,nop,wscale 7], length 0
-21:50:25.982358 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
-    127.0.0.1.80 > 127.0.0.1.35987: Flags [S.], cksum 0xfe30 (incorrect -> 0x5d17), seq 425813358, ack 1799833588, win 43690, options [mss 65495,sackOK,TS val 9946101 ecr 9946101,nop,wscale 7], length 0
-21:50:25.982404 IP (tos 0x0, ttl 64, id 33799, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.35987 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0x2f5c), seq 1, ack 1, win 342, options [nop,nop,TS val 9946101 ecr 9946101], length 0
-21:50:25.982687 IP (tos 0x0, ttl 64, id 33800, offset 0, flags [DF], proto TCP (6), length 248)
-    127.0.0.1.35987 > 127.0.0.1.80: Flags [P.], cksum 0xfeec (incorrect -> 0x130f), seq 1:197, ack 1, win 342, options [nop,nop,TS val 9946101 ecr 9946101], length 196
-21:50:25.982778 IP (tos 0x0, ttl 64, id 42650, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.80 > 127.0.0.1.35987: Flags [.], cksum 0xfe28 (incorrect -> 0x2e90), seq 1, ack 197, win 350, options [nop,nop,TS val 9946101 ecr 9946101], length 0
-21:50:25.984910 IP (tos 0x0, ttl 64, id 42651, offset 0, flags [DF], proto TCP (6), length 65)
-    127.0.0.1.80 > 127.0.0.1.35987: Flags [P.], cksum 0xfe35 (incorrect -> 0xc40a), seq 1:14, ack 197, win 350, options [nop,nop,TS val 9946102 ecr 9946101], length 13
-21:50:25.985080 IP (tos 0x0, ttl 64, id 42652, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.80 > 127.0.0.1.35987: Flags [R.], cksum 0xfe28 (incorrect -> 0x2e7e), seq 14, ack 197, win 350, options [nop,nop,TS val 9946102 ecr 9946101], length 0
-21:50:25.985475 IP (tos 0x0, ttl 64, id 33801, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.35987 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0x2e89), seq 197, ack 14, win 342, options [nop,nop,TS val 9946102 ecr 9946102], length 0
-21:50:25.985552 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
-    127.0.0.1.80 > 127.0.0.1.35987: Flags [R], cksum 0xa61d (correct), seq 425813372, win 0, length 0
+21:52:47.169883 IP6 (hlim 64, next-header TCP (6) payload length: 40) ::1.47656 > ::1.80: Flags [S], cksum 0x0030 (incorrect -> 0xb554), seq 2363571347, win 43690, options [mss 65476,sackOK,TS val 9988457 ecr 0,nop,wscale 7], length 0
+`....(.@.................................(.P..<..........0.........
+..ii........
+21:52:47.169923 IP6 (hlim 64, next-header TCP (6) payload length: 20) ::1.80 > ::1.47656: Flags [R.], cksum 0x001c (incorrect -> 0x2be1), seq 0, ack 2363571348, win 0, length 0
+`......@.................................P.(......<.P.......
+21:52:47.170249 IP (tos 0x0, ttl 64, id 435, offset 0, flags [DF], proto TCP (6), length 60)
+    127.0.0.1.36005 > 127.0.0.1.80: Flags [S], cksum 0xfe30 (incorrect -> 0x1945), seq 739862746, win 43690, options [mss 65495,sackOK,TS val 9988457 ecr 0,nop,wscale 7], length 0
+E..<..@.@.;............P,.h..........0.........
+..ii........
+21:52:47.170300 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    127.0.0.1.80 > 127.0.0.1.36005: Flags [S.], cksum 0xfe30 (incorrect -> 0xded9), seq 2484943931, ack 739862747, win 43690, options [mss 65495,sackOK,TS val 9988457 ecr 9988457,nop,wscale 7], length 0
+E..<..@.@.<..........P....<;,.h......0.........
+..ii..ii....
+21:52:47.170345 IP (tos 0x0, ttl 64, id 436, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.36005 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xb11e), seq 1, ack 1, win 342, options [nop,nop,TS val 9988457 ecr 9988457], length 0
+E..4..@.@.;............P,.h...<<...V.(.....
+..ii..ii
+21:52:47.171289 IP (tos 0x0, ttl 64, id 437, offset 0, flags [DF], proto TCP (6), length 248)
+    127.0.0.1.36005 > 127.0.0.1.80: Flags [P.], cksum 0xfeec (incorrect -> 0x94d0), seq 1:197, ack 1, win 342, options [nop,nop,TS val 9988458 ecr 9988457], length 196
+E.....@.@.:I...........P,.h...<<...V.......
+..ij..iiGET /404please HTTP/1.1
+Host: localhost
+Accept: text/plain, text/html
+Accept-Charset: *
+Accept-Encoding: *
+AcceptLanguage: en
+From: twoBerksAndAWilson
+User-Agent: customHTTPClient/0.1
+
+
+
+21:52:47.171382 IP (tos 0x0, ttl 64, id 21845, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.80 > 127.0.0.1.36005: Flags [.], cksum 0xfe28 (incorrect -> 0xb050), seq 1, ack 197, win 350, options [nop,nop,TS val 9988458 ecr 9988458], length 0
+E..4UU@.@..l.........P....<<,.i....^.(.....
+..ij..ij
+21:52:47.172066 IP (tos 0x0, ttl 64, id 21846, offset 0, flags [DF], proto TCP (6), length 65)
+    127.0.0.1.80 > 127.0.0.1.36005: Flags [P.], cksum 0xfe35 (incorrect -> 0x45cc), seq 1:14, ack 197, win 350, options [nop,nop,TS val 9988458 ecr 9988458], length 13
+E..AUV@.@..^.........P....<<,.i....^.5.....
+..ij..ijHTTP/1.1 404 
+21:52:47.172143 IP (tos 0x0, ttl 64, id 21847, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.80 > 127.0.0.1.36005: Flags [R.], cksum 0xfe28 (incorrect -> 0xb03f), seq 14, ack 197, win 350, options [nop,nop,TS val 9988458 ecr 9988458], length 0
+E..4UW@.@..j.........P....<I,.i....^.(.....
+..ij..ij
+21:52:47.172398 IP (tos 0x0, ttl 64, id 438, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.36005 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xb04b), seq 197, ack 14, win 342, options [nop,nop,TS val 9988458 ecr 9988458], length 0
+E..4..@.@.;............P,.i...<I...V.(.....
+..ij..ij
+21:52:47.172465 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    127.0.0.1.80 > 127.0.0.1.36005: Flags [R], cksum 0x5482 (correct), seq 2484943945, win 0, length 0
+E..(..@.@.<..........P....<I....P...T...
 

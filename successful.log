@@ -1,21 +1,66 @@
-21:50:09.291979 IP6 (hlim 64, next-header TCP (6) payload length: 40) ::1.47636 > ::1.80: Flags [S], cksum 0x0030 (incorrect -> 0xd833), seq 2734013623, win 43690, options [mss 65476,sackOK,TS val 9941094 ecr 0,nop,wscale 7], length 0
-21:50:09.292018 IP6 (hlim 64, next-header TCP (6) payload length: 20) ::1.80 > ::1.47636: Flags [R.], cksum 0x001c (incorrect -> 0x95bc), seq 0, ack 2734013624, win 0, length 0
-21:50:09.292296 IP (tos 0x0, ttl 64, id 32294, offset 0, flags [DF], proto TCP (6), length 60)
-    127.0.0.1.35985 > 127.0.0.1.80: Flags [S], cksum 0xfe30 (incorrect -> 0x2814), seq 1895550528, win 43690, options [mss 65495,sackOK,TS val 9941094 ecr 0,nop,wscale 7], length 0
-21:50:09.292347 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
-    127.0.0.1.80 > 127.0.0.1.35985: Flags [S.], cksum 0xfe30 (incorrect -> 0x0e38), seq 3158682759, ack 1895550529, win 43690, options [mss 65495,sackOK,TS val 9941094 ecr 9941094,nop,wscale 7], length 0
-21:50:09.292392 IP (tos 0x0, ttl 64, id 32295, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.35985 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xe07c), seq 1, ack 1, win 342, options [nop,nop,TS val 9941094 ecr 9941094], length 0
-21:50:09.292617 IP (tos 0x0, ttl 64, id 32296, offset 0, flags [DF], proto TCP (6), length 249)
-    127.0.0.1.35985 > 127.0.0.1.80: Flags [P.], cksum 0xfeed (incorrect -> 0xb256), seq 1:198, ack 1, win 342, options [nop,nop,TS val 9941094 ecr 9941094], length 197
-21:50:09.292655 IP (tos 0x0, ttl 64, id 7406, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.80 > 127.0.0.1.35985: Flags [.], cksum 0xfe28 (incorrect -> 0xdfaf), seq 1, ack 198, win 350, options [nop,nop,TS val 9941094 ecr 9941094], length 0
-21:50:09.295937 IP (tos 0x0, ttl 64, id 7407, offset 0, flags [DF], proto TCP (6), length 116)
-    127.0.0.1.80 > 127.0.0.1.35985: Flags [P.], cksum 0xfe68 (incorrect -> 0xce26), seq 1:65, ack 198, win 350, options [nop,nop,TS val 9941095 ecr 9941094], length 64
-21:50:09.296214 IP (tos 0x0, ttl 64, id 7408, offset 0, flags [DF], proto TCP (6), length 321)
-    127.0.0.1.80 > 127.0.0.1.35985: Flags [FP.], cksum 0xff35 (incorrect -> 0x1d92), seq 65:334, ack 198, win 350, options [nop,nop,TS val 9941095 ecr 9941094], length 269
-21:50:09.296852 IP (tos 0x0, ttl 64, id 32297, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.35985 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xdf75), seq 198, ack 65, win 342, options [nop,nop,TS val 9941095 ecr 9941095], length 0
-21:50:09.297588 IP (tos 0x0, ttl 64, id 32298, offset 0, flags [DF], proto TCP (6), length 52)
-    127.0.0.1.35985 > 127.0.0.1.80: Flags [R.], cksum 0xfe28 (incorrect -> 0xde5b), seq 198, ack 335, win 350, options [nop,nop,TS val 9941095 ecr 9941095], length 0
+21:52:17.337206 IP6 (hlim 64, next-header TCP (6) payload length: 40) ::1.47654 > ::1.80: Flags [S], cksum 0x0030 (incorrect -> 0x9c2f), seq 3337109161, win 43690, options [mss 65476,sackOK,TS val 9979507 ecr 0,nop,wscale 7], length 0
+`....(.@.................................&.P..>..........0.........
+..Fs........
+21:52:17.337225 IP6 (hlim 64, next-header TCP (6) payload length: 20) ::1.80 > ::1.47654: Flags [R.], cksum 0x001c (incorrect -> 0xefc5), seq 0, ack 3337109162, win 0, length 0
+`......@.................................P.&......>.P.......
+21:52:17.337331 IP (tos 0x0, ttl 64, id 42526, offset 0, flags [DF], proto TCP (6), length 60)
+    127.0.0.1.36003 > 127.0.0.1.80: Flags [S], cksum 0xfe30 (incorrect -> 0x427d), seq 2923815021, win 43690, options [mss 65495,sackOK,TS val 9979507 ecr 0,nop,wscale 7], length 0
+E..<..@.@..............P.E.m.........0.........
+..Fs........
+21:52:17.337356 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    127.0.0.1.80 > 127.0.0.1.36003: Flags [S.], cksum 0xfe30 (incorrect -> 0xd347), seq 1904326295, ack 2923815022, win 43690, options [mss 65495,sackOK,TS val 9979507 ecr 9979507,nop,wscale 7], length 0
+E..<..@.@.<..........P..q....E.n.....0.........
+..Fs..Fs....
+21:52:17.337865 IP (tos 0x0, ttl 64, id 42527, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.36003 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xa58b), seq 1, ack 1, win 342, options [nop,nop,TS val 9979508 ecr 9979507], length 0
+E..4..@.@..............P.E.nq......V.(.....
+..Ft..Fs
+21:52:17.337974 IP (tos 0x0, ttl 64, id 42528, offset 0, flags [DF], proto TCP (6), length 249)
+    127.0.0.1.36003 > 127.0.0.1.80: Flags [P.], cksum 0xfeed (incorrect -> 0x7765), seq 1:198, ack 1, win 342, options [nop,nop,TS val 9979508 ecr 9979507], length 197
+E.... @.@..............P.E.nq......V.......
+..Ft..FsGET /index.html HTTP/1.1
+Host: localhost
+Accept: text/plain, text/html
+Accept-Charset: *
+Accept-Encoding: *
+AcceptLanguage: en
+From: twoBerksAndAWilson
+User-Agent: customHTTPClient/0.1
+
+
+
+21:52:17.337992 IP (tos 0x0, ttl 64, id 61676, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.80 > 127.0.0.1.36003: Flags [.], cksum 0xfe28 (incorrect -> 0xa4bd), seq 1, ack 198, win 350, options [nop,nop,TS val 9979508 ecr 9979508], length 0
+E..4..@.@.K..........P..q....E.3...^.(.....
+..Ft..Ft
+21:52:17.338411 IP (tos 0x0, ttl 64, id 61677, offset 0, flags [DF], proto TCP (6), length 116)
+    127.0.0.1.80 > 127.0.0.1.36003: Flags [P.], cksum 0xfe68 (incorrect -> 0x9335), seq 1:65, ack 198, win 350, options [nop,nop,TS val 9979508 ecr 9979508], length 64
+E..t..@.@.K..........P..q....E.3...^.h.....
+..Ft..FtHTTP/1.1 200 OK
+Server: http_server/1.0
+Content-Length: 96
+
+
+21:52:17.338713 IP (tos 0x0, ttl 64, id 61678, offset 0, flags [DF], proto TCP (6), length 321)
+    127.0.0.1.80 > 127.0.0.1.36003: Flags [FP.], cksum 0xff35 (incorrect -> 0xe2a0), seq 65:334, ack 198, win 350, options [nop,nop,TS val 9979508 ecr 9979508], length 269
+E..A..@.@.J..........P..q....E.3...^.5.....
+..Ft..Ft<html>
+<head><title>Default index.html</title></head>
+<body><h1>Hello world</h1></body>
+</html>
+HTTP/1.1 405 Method not allowed
+Server: http_server/1.0
+Content-Length: 93
+
+<html><head><title>Error 405</title></head>
+<body>Error 405: Method not allowed</body><html>
+
+21:52:17.338881 IP (tos 0x0, ttl 64, id 42529, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.36003 > 127.0.0.1.80: Flags [.], cksum 0xfe28 (incorrect -> 0xa485), seq 198, ack 65, win 342, options [nop,nop,TS val 9979508 ecr 9979508], length 0
+E..4.!@.@..............P.E.3q......V.(.....
+..Ft..Ft
+21:52:17.339394 IP (tos 0x0, ttl 64, id 42530, offset 0, flags [DF], proto TCP (6), length 52)
+    127.0.0.1.36003 > 127.0.0.1.80: Flags [R.], cksum 0xfe28 (incorrect -> 0xa36b), seq 198, ack 335, win 350, options [nop,nop,TS val 9979508 ecr 9979508], length 0
+E..4."@.@..............P.E.3q......^.(.....
+..Ft..Ft
 
